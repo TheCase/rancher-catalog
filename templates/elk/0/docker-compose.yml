@@ -111,7 +111,7 @@ services:
     ports:
       - "9000:9000"
     links:
-      - es-client
+      - es-client:elasticsearch
     labels:
       io.rancher.container.hostname_override: container_name
 
@@ -146,7 +146,7 @@ services:
     - logstash-config
     restart: always
     links:
-      - es-client
+      - es-client:elasticsearch
     labels:
       io.rancher.sidekicks: logstash-config
       io.rancher.container.hostname_override: container_name
@@ -161,7 +161,7 @@ services:
     ports:
     - "5601:5601/tcp"
     links:
-      - es-client
+      - es-client:elasticsearch
     labels:
       io.rancher.container.hostname_override: container_name
 
