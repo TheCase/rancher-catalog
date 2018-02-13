@@ -1,0 +1,6 @@
+---
+name: elk-tools
+description: |
+  ELK Tools - Kibana, Cerebro
+version: 1.0.0
+category: Monitoring

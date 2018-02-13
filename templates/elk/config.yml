@@ -1,0 +1,6 @@
+---
+name: elk
+description: |
+  ELK Stack (Log Monitoring) - ElasticSearch, LogSpout, LogStash, Kibana
+version: 1.0.0
+category: Monitoring

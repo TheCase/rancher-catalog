@@ -1,0 +1,27 @@
+---
+version: '2'
+
+services:
+
+  cerebro:
+    image: yannart/cerebro:${cerebro_version}
+    ports:
+      - "9000:9000"
+    external_links:
+      - elk-data/elasticsearch:elasticsearch
+    labels:
+      io.rancher.container.hostname_override: container_name
+
+  kibana:
+    restart: always
+    tty: true
+    image: docker.elastic.co/kibana/kibana:${elk_version}
+    stdin_open: true
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+    ports:
+    - "5601:5601/tcp"
+    external_links:
+      - elk-data/elasticsearch:elasticsearch
+    labels:
+      io.rancher.container.hostname_override: container_name

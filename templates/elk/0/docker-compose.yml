@@ -1,0 +1,152 @@
+---
+version: '2'
+
+volumes:
+  es-data:
+    per_container: true
+    driver: rancher-nfs
+
+services:
+  es-master:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${elk_version}
+    environment:
+      - "cluster.name=${cluster_name}"
+      - "node.name=$${HOSTNAME}"
+      - "bootstrap.memory_lock=true"
+      - "xpack.security.enabled=false"
+      - "discovery.zen.ping.unicast.hosts=es-master"
+      - "ES_JAVA_OPTS=-Xms${es_heap_size} -Xmx${es_heap_size}"
+      - "node.master=true"
+      - "node.data=false"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: ${es_mem_limit}
+    mem_swappiness: 0
+    cap_add:
+      - IPC_LOCK
+        #    links:
+        #- elasticsearch
+    labels:
+      io.rancher.sidekicks: es-sysctl
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name} # one per host (soft)
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${elk_version}
+    volumes:
+    - es-data:/usr/share/elasticsearch/data
+    environment:
+      - "cluster.name=${cluster_name}"
+      - "node.name=$${HOSTNAME}"
+      - "bootstrap.memory_lock=true"
+      - "xpack.security.enabled=false"
+      - "discovery.zen.ping.unicast.hosts=es-master"
+      - "ES_JAVA_OPTS=-Xms${es_heap_size} -Xmx${es_heap_size}"
+      - "node.master=false"
+      - "node.data=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: ${es_mem_limit}
+    mem_swappiness: 0
+    cap_add:
+      - IPC_LOCK
+        #links:
+        #- es-master
+    labels:
+      io.rancher.sidekicks: es-sysctl
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name} # one per host (soft)
+
+  es-sysctl:
+    image: rawmind/alpine-sysctl:0.1
+    network_mode: none
+    privileged: true
+    environment:
+      - "SYSCTL_KEY=vm.max_map_count"
+      - "SYSCTL_VALUE=262144"
+    labels:
+      io.rancher.container.start_once: true
+
+  cerebro:
+    image: yannart/cerebro:${cerebro_version}
+    ports:
+      - "9000:9000"
+    links:
+      - elasticsearch
+    labels:
+      io.rancher.container.hostname_override: container_name
+
+  logspout:
+    image: bekt/logspout-logstash:latest
+    #    tty: true
+    #stdin_open: true
+    restart: always
+    environment:
+      ROUTE_URIS: "logstash+tcp://lb:5000"
+      LOGSPOUT: 'ignore'
+      # ALLOW_TTY: 'true'
+    volumes:
+    - '/var/run/docker.sock:/var/run/docker.sock'
+    links:
+    - lb
+    labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.container.hostname_override: container_name
+
+  logstash-config:
+    image: rancher/logstash-config:v0.2.0
+    restart: always
+    labels:
+      io.rancher.container.hostname_override: container_name
+
+  logstash:
+    image: logstash:${elk_version}-alpine
+    tty: true
+    stdin_open: true
+    command:
+    - logstash
+    - -f
+    - /etc/logstash
+    volumes_from:
+    - logstash-config
+    restart: always
+    links:
+      - elasticsearch
+    labels:
+      io.rancher.sidekicks: logstash-config
+      io.rancher.container.hostname_override: container_name
+
+  kibana:
+    restart: always
+    tty: true
+    image: docker.elastic.co/kibana/kibana:${elk_version}
+    stdin_open: true
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+    ports:
+    - "5601:5601/tcp"
+    links:
+      - elasticsearch
+    labels:
+      io.rancher.container.hostname_override: container_name
+
+  lb:
+    image: rancher/lb-service-haproxy:v0.7.6
+    ports:
+    - 5000:5000/tcp
+    environment:
+      ENABLE_STATS: 'true'
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+      io.rancher.scheduler.global: 'true'

@@ -1,0 +1,6 @@
+---
+name: elk-data-temp
+description: |
+  ELK Data Temp - ElasticSearch Data upgrade silos
+version: 1.0.0
+category: Monitoring

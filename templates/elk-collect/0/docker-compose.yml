@@ -1,0 +1,50 @@
+---
+version: '2'
+
+services:
+
+  logspout:
+    image: bekt/logspout-logstash:latest
+    restart: always
+    environment:
+      ROUTE_URIS: "logstash+tcp://lb:5000"
+      LOGSPOUT: 'ignore'
+    volumes:
+    - '/var/run/docker.sock:/var/run/docker.sock'
+    links:
+    - lb
+    labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.container.hostname_override: container_name
+
+  logstash-config:
+    image: rancher/logstash-config:v0.2.0
+    restart: always
+    labels:
+      io.rancher.container.hostname_override: container_name
+
+  logstash:
+    image: logstash:${elk_version}-alpine
+    command:
+    - logstash
+    - -f
+    - /etc/logstash
+    volumes_from:
+    - logstash-config
+    restart: always
+    external_links:
+      - elk-data/elasticsearch:elasticsearch # stack/service:alias
+    labels:
+      io.rancher.sidekicks: logstash-config
+      io.rancher.container.hostname_override: container_name
+
+  lb:
+    image: rancher/lb-service-haproxy:v0.7.6
+    ports:
+    - 5000:5000/tcp
+    environment:
+      ENABLE_STATS: 'true'
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+      io.rancher.scheduler.global: 'true'

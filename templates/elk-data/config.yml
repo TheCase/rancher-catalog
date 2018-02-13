@@ -1,0 +1,6 @@
+---
+name: elk-data
+description: |
+  ELK Data - ElasticSearch Cluster
+version: 1.0.0
+category: Monitoring

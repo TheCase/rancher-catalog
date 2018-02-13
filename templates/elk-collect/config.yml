@@ -1,0 +1,6 @@
+---
+name: elk-collect
+description: |
+  ELK Collectors - LogSpout, LogStash
+version: 1.0.0
+category: Monitoring

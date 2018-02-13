@@ -1,0 +1,77 @@
+---
+.catalog:
+  name: "elk"
+  version: "1.0.0"
+  description: "Log Monitoring Stack"
+  questions:
+    - variable: "elk_version"
+      type: "string"
+      required: true
+      label: "ELK image version"
+      default: "5.5.2"
+    - variable: "logstash_inputs"
+      description: |
+        Logstash inputs. These will be added to input { } section
+        of logstash.conf
+      label: "Logstash inputs"
+      type: "multiline"
+      required: true
+      default: |
+        tcp {
+          port => "5000"
+          codec => "json"
+        }
+    - variable: "logstash_filters"
+      description: |
+        Logstash filters. These will be added to filter { } section
+        of logstash.conf
+      label: "Logstash filters"
+      type: "multiline"
+      required: false
+      default: "" 
+    - variable: "logstash_outputs"
+      description: |
+        Logstash outputs. These will be added to output { } section
+        of logstash.conf
+      label: "Logstash outputs"
+      type: "multiline"
+      required: true
+      default: |
+        elasticsearch {
+          hosts => ["elasticsearch:9200"]
+        }
+    - variable: "cluster_name"
+      type: "string"
+      required: true
+      label: "Cluster name"
+      description: "Name of the Elasticsearch Cluster"
+      default: "elk-cluster"
+
+logstash:
+  metadata:
+    logstash:
+      inputs: |
+        ${logstash_inputs}
+      filters: |
+        ${logstash_filters}
+      outputs: |
+        ${logstash_outputs}
+
+lb:
+  start_on_create: true
+  lb_config:
+    certs: []
+    default_cert:
+    port_rules:
+    - priority: 1
+      protocol: tcp
+      service: logstash
+      source_port: 5000
+      target_port: 5000
+  health_check:
+    healthy_threshold: 2
+    response_timeout: 2000
+    port: 42
+    unhealthy_threshold: 3
+    strategy: recreate
+    interval: 2000
