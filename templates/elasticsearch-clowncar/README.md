@@ -23,7 +23,7 @@ type: PUT
 path: */_settings
 request:
 {
-  "index.routing.allocation.require.stack": "es-clowncar"
+  "index.routing.allocation.require.stack_id": "es-clowncar"
 }
 ```
 #### Upgrade the target ES stack
@@ -34,6 +34,8 @@ Once the shards have moved to the temp nodes (watch the progress in Cerebro - do
 
 When all of the main stack Elasticsearch nodes have been upgraded, you can remove the allocation rule so that all data will move off the temporary nodes:
 
+#### Enable allocation awareness
+`stack_id`
 #### Relocate shards to upgraded nodes
 
 In Cerebro or Kibana REST tools:
