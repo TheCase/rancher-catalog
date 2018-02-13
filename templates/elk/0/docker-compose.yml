@@ -29,8 +29,8 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-        #    links:
-        #- elasticsearch
+    links:
+      - elasticsearch
     labels:
       io.rancher.sidekicks: es-sysctl
       io.rancher.container.hostname_override: container_name
@@ -60,8 +60,8 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-        #links:
-        #- es-master
+    links:
+      - es-master
     labels:
       io.rancher.sidekicks: es-sysctl
       io.rancher.container.hostname_override: container_name
