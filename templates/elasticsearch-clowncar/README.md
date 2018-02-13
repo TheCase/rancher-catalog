@@ -1,41 +1,51 @@
-##Elasticsearch Clown Car
+## Elasticsearch Clown Car
 
-This stack will tie into the master `elk-data` stack as a set of master and data nodes that can be used transfer and hold shards during the master stack upgrade process, thus preventing the loss of data that will no doubt occur should one follow the standard Rancher stack upgrade process.
+This stack will tie into a `elk-data` stack as a set of master/data nodes that can be used transfer and hold shards during the stack upgrade process, thus preventing the loss of data that will, no doubt, occur should one follow the standard Rancher stack upgrade process.
 
-###Instructions:
+### Instructions:
 
-#### Stand up the new stack.
+#### Stand up the ClownCar stack
 
-be sure the following stack parameters match your master ES data stack:
+Ensure the following stack parameters match your master ES data stack:
 
-`external_link`: master Elasticsearch stack <stack_name>/<service_name>:<alias>
+- `Scale` This should match in node count, plus storage space per node
+- `external_link` Elasticsearch Rancher stack *stack_name*/*service_name*
+- `cluster_name` Elasticsearch cluster name
 
-`cluster_name`: master Elasticsearch cluster name
+#### Verify attachment to main ES stack
+Once the new ClownCar nodes are up and attached to the cluster, you'll notice shards will start allocating to the new nodes.  We will instantiate shard allocation rules to the stack to force all shards to live on the new nodes:
 
-Once the new nodes are up and attached to the cluster, you'll notice shards will start allocating to the new nodes.  Now we will intiate shard allocation rules to the stack to force all shards to live on the new nodes:
+#### Migrate the shards to the ClownCar silos
 
 In Cerebro or Kibana REST tools:
-type: `PUT`
-path: `\*/\_settings`
-request:
 ```
+type: PUT
+path: */_settings
+request:
 {
   "index.routing.allocation.require.stack": "es-clowncar"
 }
 ```
+#### Upgrade the target ES stack
 
-Once the shards have moved to the temp nodes (watch the progress in Cerebro), you can start the upgrade of the master nodes.  NOTE: when upgrading any Elasticasearch master nodes, please check the "Start before Stopping" batch setting and with a Batch Size of 1 and a Batch Interval of at least 300 seconds.
+Once the shards have moved to the temp nodes (watch the progress in Cerebro - don't forget the .special indices!), you can start the upgrade of the master nodes.
 
-When all the main stack Elasticsearch nodes have been upgraded, you can remove the allocation rule so that all data will move off the temporary nodes:
+**Suggestion**: when upgrading any Elasticsearch master nodes, please **check** the `Start before Stopping` batch setting and with a `Batch Size` of **1** and a `Batch Interval` of at least **60** seconds.
+
+When all of the main stack Elasticsearch nodes have been upgraded, you can remove the allocation rule so that all data will move off the temporary nodes:
+
+#### Relocate shards to upgraded nodes
 
 In Cerebro or Kibana REST tools:
-type: `PUT`
-path: `\*/\_settings`
-request:
 ```
+type: PUT
+path: */_settings
+request:
 {
   "index.routing.allocation.exclude.stack": "es-clowncar"
 }
 ```
 
-Once the shards have been migrated, you may destroy the `elk-data-temp` stack.
+#### Finish
+
+Once the all shards have been migrated, you may destroy the `elasticsearch-clowncar` stack.
