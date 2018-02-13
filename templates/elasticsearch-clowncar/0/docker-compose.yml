@@ -17,7 +17,7 @@ services:
       - "node.attr.stack=es-clowncar"
       - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
-      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+      - "discovery.zen.ping.unicast.hosts=${external_link}"
       - "ES_JAVA_OPTS=-Xms${es_heap_size} -Xmx${es_heap_size}"
       - "node.master=true"
       - "node.data=true"
@@ -32,8 +32,8 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-    external_links:
-      - ${external_link}:elasticsearch
+        #    external_links:
+        #- ${external_link}:elasticsearch
     labels:
       io.rancher.sidekicks: sysctl
       io.rancher.container.hostname_override: container_name
