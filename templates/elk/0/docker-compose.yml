@@ -8,7 +8,7 @@ volumes:
 
 services:
   es-master:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${elk_version}
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
     environment:
       - "cluster.name=${cluster_name}"
       - "node.name=$${HOSTNAME}"
@@ -35,7 +35,7 @@ services:
       io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name} # one per host (soft)
 
   es-data:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${elk_version}
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
     volumes:
     - es-data:/usr/share/elasticsearch/data
     environment:
@@ -66,7 +66,7 @@ services:
       io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name} # one per host (soft)
 
   es-client:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${elk_version}
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
     volumes:
     - es-data:/usr/share/elasticsearch/data
     environment:
@@ -107,7 +107,7 @@ services:
       io.rancher.container.start_once: true
 
   cerebro:
-    image: yannart/cerebro:${cerebro_version}
+    image: yannart/cerebro:0.7.2
     ports:
       - "9000:9000"
     links:
@@ -135,7 +135,7 @@ services:
       io.rancher.container.hostname_override: container_name
 
   logstash:
-    image: logstash:${elk_version}-alpine
+    image: logstash:5.5.2-alpine
     tty: true
     stdin_open: true
     command:
@@ -154,7 +154,7 @@ services:
   kibana:
     restart: always
     tty: true
-    image: docker.elastic.co/kibana/kibana:${elk_version}
+    image: docker.elastic.co/kibana/kibana:5.5.2
     stdin_open: true
     environment:
       - "ELASTICSEARCH_URL=http://elasticsearch:9200"
