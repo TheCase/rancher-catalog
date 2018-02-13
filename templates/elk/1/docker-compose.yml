@@ -12,7 +12,7 @@ services:
     environment:
       - "cluster.name=${cluster_name}"
       - "node.name=$${HOSTNAME}"
-      - "node.attr.stack_id=${stack_name}"
+      - "node.attr.stack_id=$${stack_name}"
       - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
       - "discovery.zen.ping.unicast.hosts=es-master"
@@ -42,7 +42,7 @@ services:
     environment:
       - "cluster.name=${cluster_name}"
       - "node.name=$${HOSTNAME}"
-      - "node.attr.stack_id=${stack_name}"
+      - "node.attr.stack_id=$${stack_name}"
       - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
       - "discovery.zen.ping.unicast.hosts=es-master"
@@ -74,7 +74,7 @@ services:
     environment:
       - "cluster.name=${cluster_name}"
       - "node.name=$${HOSTNAME}"
-      - "node.attr.stack_id=${stack_name}"
+      - "node.attr.stack_id=$${stack_name}"
       - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
       - "discovery.zen.ping.unicast.hosts=es-master"
