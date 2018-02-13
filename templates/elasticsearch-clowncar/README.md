@@ -23,7 +23,7 @@ type: PUT
 path: */_settings
 request:
 {
-  "index.routing.allocation.require.stack_id": "elasticsearch-clowncar"
+  "index.routing.allocation.require.stack_id": "_clowncar"
 }
 ```
 #### Upgrade the target ES stack
@@ -45,7 +45,6 @@ path: */_settings
 request:
 {
   "index.routing.allocation.require.stack_id": "*",
-#  "index.routing.allocation.exclude.stack_id": "elasticsearch-clowncar"
 }
 ```
 
