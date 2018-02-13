@@ -1,7 +1,7 @@
 ---
 .catalog:
   name: "elk-tools"
-  version: "1.0.0"
+  version: "6.2.0-0"
   description: "ELK Tools"
   questions:
     - variable: "elk_version"

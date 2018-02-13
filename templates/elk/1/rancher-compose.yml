@@ -1,7 +1,7 @@
 ---
 .catalog:
   name: "elk"
-  version: "5.6.7"
+  version: "5.6.7_0"
   description: "Log Monitoring Stack"
   questions:
     - variable: "logstash_inputs"

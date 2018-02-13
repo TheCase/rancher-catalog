@@ -24,7 +24,7 @@ services:
       io.rancher.container.hostname_override: container_name
 
   logstash-logspout:
-    image: logstash:${elk_version}-alpine
+    image: logstash:6.2.0-alpine
     command:
     - logstash
     - -f
@@ -45,7 +45,7 @@ services:
       io.rancher.container.hostname_override: container_name
 
   logstash-syslog-logspout:
-    image: logstash:${elk_version}-alpine
+    image: logstash:6.2.0-alpine
     command:
     - logstash
     - -f

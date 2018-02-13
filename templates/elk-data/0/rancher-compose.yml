@@ -1,14 +1,9 @@
 ---
 .catalog:
   name: "elk-data"
-  version: "1.0.0"
+  version: "6.2.0-0"
   description: "ELK Elasticsearch Cluster"
   questions:
-    - variable: "elk_version"
-      type: "string"
-      required: true
-      label: "ELK image version"
-      default: "5.5.2"
     - variable: "cluster_name"
       type: "string"
       required: true
