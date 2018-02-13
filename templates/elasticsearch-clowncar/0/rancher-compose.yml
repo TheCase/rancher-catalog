@@ -21,7 +21,7 @@
       label: "stack/service name"
       description: "<stack>/<service> name to link to your master Elasticsearch stack and service"
       #      default: "elk-data/es-master"
-      default: "es-maste.elk.rancher.internal"
+      default: "es-master.elk.rancher.internal"
     - variable: "es_heap_size"
       type: "string"
       required: true
