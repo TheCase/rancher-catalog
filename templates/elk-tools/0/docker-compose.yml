@@ -4,7 +4,7 @@ version: '2'
 services:
 
   cerebro:
-    image: yannart/cerebro:${cerebro_version}
+    image: yannart/cerebro:0.7.2
     ports:
       - "9000:9000"
     external_links:
@@ -15,7 +15,7 @@ services:
   kibana:
     restart: always
     tty: true
-    image: docker.elastic.co/kibana/kibana:${elk_version}
+    image: docker.elastic.co/kibana/kibana:6.2.0
     stdin_open: true
     environment:
       - "ELASTICSEARCH_URL=http://elasticsearch:9200"

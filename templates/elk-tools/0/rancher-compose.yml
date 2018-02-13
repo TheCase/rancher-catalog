@@ -3,14 +3,3 @@
   name: "elk-tools"
   version: "6.2.0-0"
   description: "ELK Tools"
-  questions:
-    - variable: "elk_version"
-      type: "string"
-      required: true
-      label: "ELK image version"
-      default: "5.5.2"
-    - variable: "cerebro_version"
-      type: "string"
-      required: true
-      label: "Cerebro image version"
-      default: "0.7.2"
