@@ -9,37 +9,6 @@
       required: true
       label: "ELK image version"
       default: "5.5.2"
-    - variable: "logstash_inputs"
-      description: |
-        Logstash inputs. These will be added to input { } section
-        of logstash.conf
-      label: "Logstash inputs"
-      type: "multiline"
-      required: true
-      default: |
-        tcp {
-          port => "5000"
-          codec => "json"
-        }
-    - variable: "logstash_filters"
-      description: |
-        Logstash filters. These will be added to filter { } section
-        of logstash.conf
-      label: "Logstash filters"
-      type: "multiline"
-      required: false
-      default: "" 
-    - variable: "logstash_outputs"
-      description: |
-        Logstash outputs. These will be added to output { } section
-        of logstash.conf
-      label: "Logstash outputs"
-      type: "multiline"
-      required: true
-      default: |
-        elasticsearch {
-          hosts => ["elasticsearch:9200"]
-        }
     - variable: "cluster_name"
       type: "string"
       required: true
@@ -47,16 +16,35 @@
       description: "Name of the Elasticsearch Cluster"
       default: "elk-cluster"
 
-logstash:
+logstash-logspout:
   metadata:
     logstash:
       inputs: |
-        ${logstash_inputs}
-      filters: |
-        ${logstash_filters}
+        tcp {
+          port => "5000"
+          codec => "json"
+        }
+      filters: ""
       outputs: |
-        ${logstash_outputs}
+        elasticsearch {
+          hosts => ["elasticsearch:9200"]
+          index => [ "logstash-%{+YYYY.MM.dd}" ]
+        }
 
+logstash-syslog:
+  metadata:
+    logstash:
+      inputs: |
+        tcp {
+          port => "5514"
+          proxy_protocol => true
+        }
+      filters: ""
+      outputs: |
+        elasticsearch {
+          hosts => ["elasticsearch:9200"]
+          index => [ "syslog-%{+YYYY.MM.dd}" ]
+        }
 lb:
   start_on_create: true
   lb_config:
@@ -65,9 +53,14 @@ lb:
     port_rules:
     - priority: 1
       protocol: tcp
-      service: logstash
+      service: logstash-logspout
       source_port: 5000
       target_port: 5000
+    - priority: 1
+      protocol: tcp
+      service: logstash-syslog
+      source_port: 5514
+      target_port: 5514
   health_check:
     healthy_threshold: 2
     response_timeout: 2000

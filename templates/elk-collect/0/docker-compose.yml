@@ -17,23 +17,44 @@ services:
       io.rancher.scheduler.global: 'true'
       io.rancher.container.hostname_override: container_name
 
-  logstash-config:
+  logstash-logspout-config:
     image: rancher/logstash-config:v0.2.0
     restart: always
     labels:
       io.rancher.container.hostname_override: container_name
 
-  logstash:
+  logstash-logspout:
     image: logstash:${elk_version}-alpine
     command:
     - logstash
     - -f
     - /etc/logstash
     volumes_from:
-    - logstash-config
+    - logstash-logspout-config
     restart: always
     external_links:
-      - elk-data/elasticsearch:elasticsearch # stack/service:alias
+      - elk-data/client:elasticsearch # stack/service:alias
+    labels:
+      io.rancher.sidekicks: logstash-config
+      io.rancher.container.hostname_override: container_name
+
+  logstash-syslog-config:
+    image: rancher/logstash-config:v0.2.0
+    restart: always
+    labels:
+      io.rancher.container.hostname_override: container_name
+
+  logstash-syslog-logspout:
+    image: logstash:${elk_version}-alpine
+    command:
+    - logstash
+    - -f
+    - /etc/logstash
+    volumes_from:
+    - logstash-syslog-config
+    restart: always
+    external_links:
+      - elk-data/client:elasticsearch # stack/service:alias
     labels:
       io.rancher.sidekicks: logstash-config
       io.rancher.container.hostname_override: container_name
@@ -42,6 +63,7 @@ services:
     image: rancher/lb-service-haproxy:v0.7.6
     ports:
     - 5000:5000/tcp
+    - 5514:5514/tcp
     environment:
       ENABLE_STATS: 'true'
     labels:

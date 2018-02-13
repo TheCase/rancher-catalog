@@ -27,10 +27,24 @@
       label: "Memory limit in byte (elastic nodes)"
       description: "Memory limit in Byte per elasticsearch container. AT LEAST double the heap size! (data nodes)"
       default: 2147483648
-    - variable: "initial_es_nodes"
-      label: "Elasticsearch nodes"
+    - variable: "initial_es_masters"
+      label: "Elasticsearch Master nodes"
       type: "int"
       required: true
       default: 2
-elasticsearch:
-  scale: ${initial_es_nodes}
+    - variable: "initial_es_datas"
+      label: "Elasticsearch Data nodes"
+      type: "int"
+      required: true
+      default: 3
+    - variable: "initial_es_clients"
+      label: "Elasticsearch Client nodes"
+      type: "int"
+      required: true
+      default: 2
+master:
+  scale: ${initial_es_masters}
+data:
+  scale: ${initial_es_datas}
+client:
+  scale: ${initial_es_clients}

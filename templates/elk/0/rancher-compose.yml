@@ -71,7 +71,9 @@
 
 es-master:
   scale: ${initial_es_nodes}
-elasticsearch:
+es-data:
+  scale: ${initial_es_nodes}
+es-client:
   scale: ${initial_es_nodes}
 
 logstash:

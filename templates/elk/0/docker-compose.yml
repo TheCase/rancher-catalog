@@ -29,14 +29,12 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-    links:
-      - elasticsearch
     labels:
       io.rancher.sidekicks: es-sysctl
       io.rancher.container.hostname_override: container_name
       io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name} # one per host (soft)
 
-  elasticsearch:
+  es-data:
     image: docker.elastic.co/elasticsearch/elasticsearch:${elk_version}
     volumes:
     - es-data:/usr/share/elasticsearch/data
@@ -49,6 +47,37 @@ services:
       - "ES_JAVA_OPTS=-Xms${es_heap_size} -Xmx${es_heap_size}"
       - "node.master=false"
       - "node.data=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: ${es_mem_limit}
+    mem_swappiness: 0
+    cap_add:
+      - IPC_LOCK
+    links:
+      - es-master
+    labels:
+      io.rancher.sidekicks: es-sysctl
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name} # one per host (soft)
+
+  es-client:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${elk_version}
+    volumes:
+    - es-data:/usr/share/elasticsearch/data
+    environment:
+      - "cluster.name=${cluster_name}"
+      - "node.name=$${HOSTNAME}"
+      - "bootstrap.memory_lock=true"
+      - "xpack.security.enabled=false"
+      - "discovery.zen.ping.unicast.hosts=es-master"
+      - "ES_JAVA_OPTS=-Xms${es_heap_size} -Xmx${es_heap_size}"
+      - "node.master=false"
+      - "node.data=false"
     ulimits:
       memlock:
         soft: -1
@@ -82,7 +111,7 @@ services:
     ports:
       - "9000:9000"
     links:
-      - elasticsearch
+      - es-client
     labels:
       io.rancher.container.hostname_override: container_name
 
@@ -121,7 +150,7 @@ services:
     - logstash-config
     restart: always
     links:
-      - elasticsearch
+      - es-client
     labels:
       io.rancher.sidekicks: logstash-config
       io.rancher.container.hostname_override: container_name
@@ -136,7 +165,7 @@ services:
     ports:
     - "5601:5601/tcp"
     links:
-      - elasticsearch
+      - es-client
     labels:
       io.rancher.container.hostname_override: container_name
 
