@@ -1,0 +1,6 @@
+---
+name: elasticsearch-clowncar
+description: |
+  Elasticsearch Clown Car - temporary side-running stack for ES data stores during upgrades
+version: 1.0.0
+category: Monitoring

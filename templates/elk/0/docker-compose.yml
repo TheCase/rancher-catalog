@@ -58,8 +58,8 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-    links:
-      - es-master
+#    links:
+#      - es-master
     labels:
       io.rancher.sidekicks: es-sysctl
       io.rancher.container.hostname_override: container_name
@@ -89,8 +89,8 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-    links:
-      - es-master
+#    links:
+#      - es-master
     labels:
       io.rancher.sidekicks: es-sysctl
       io.rancher.container.hostname_override: container_name
@@ -117,13 +117,9 @@ services:
 
   logspout:
     image: bekt/logspout-logstash:latest
-    #    tty: true
-    #stdin_open: true
     restart: always
     environment:
       ROUTE_URIS: "logstash+tcp://lb:5000"
-      LOGSPOUT: 'ignore'
-      # ALLOW_TTY: 'true'
     volumes:
     - '/var/run/docker.sock:/var/run/docker.sock'
     links:

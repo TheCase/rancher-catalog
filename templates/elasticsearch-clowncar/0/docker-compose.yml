@@ -14,7 +14,7 @@ services:
     environment:
       - "cluster.name=${cluster_name}"
       - "node.name=$${HOSTNAME}"
-      - "node.attr.stack=elk-data-temp"
+      - "node.attr.stack=es-clowncar"
       - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
       - "discovery.zen.ping.unicast.hosts=elasticsearch"

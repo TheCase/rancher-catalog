@@ -1,6 +1,6 @@
-i##ELK Data Temp
+##Elasticsearch Clown Car
 
-This stack will tie into the master `elk-data` stack as a set of data nodes that can be used transfer and hold shards during the master stack upgrade process, thus preventing the loss of data that will no doubt occur should one follow the standard Rancher stack upgrade process.
+This stack will tie into the master `elk-data` stack as a set of master and data nodes that can be used transfer and hold shards during the master stack upgrade process, thus preventing the loss of data that will no doubt occur should one follow the standard Rancher stack upgrade process.
 
 ###Instructions:
 
@@ -20,7 +20,7 @@ path: `\*/\_settings`
 request:
 ```
 {
-  "index.routing.allocation.require.stack": "elk-data-temp"
+  "index.routing.allocation.require.stack": "es-clowncar"
 }
 ```
 
@@ -34,7 +34,7 @@ path: `\*/\_settings`
 request:
 ```
 {
-  "index.routing.allocation.exclude.stack": "elk-data-temp"
+  "index.routing.allocation.exclude.stack": "es-clowncar"
 }
 ```
 
