@@ -58,8 +58,8 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-#    links:
-#      - es-master
+        #    links:
+      #- es-master
     labels:
       io.rancher.sidekicks: es-sysctl
       io.rancher.container.hostname_override: container_name
@@ -67,8 +67,6 @@ services:
 
   es-client:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
-    volumes:
-    - es-data:/usr/share/elasticsearch/data
     environment:
       - "cluster.name=${cluster_name}"
       - "node.name=$${HOSTNAME}"
@@ -89,8 +87,8 @@ services:
     mem_swappiness: 0
     cap_add:
       - IPC_LOCK
-#    links:
-#      - es-master
+    links:
+      - es-master
     labels:
       io.rancher.sidekicks: es-sysctl
       io.rancher.container.hostname_override: container_name
